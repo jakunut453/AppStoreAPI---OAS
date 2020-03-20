@@ -9,9 +9,11 @@ An API specification was made for a Mobile App store using OAS 3.0 (Open API Spe
 * [YAML OAS3 on swaggerhub here](https://app.swaggerhub.com/apis/jakunut453/Mobile_AppStore_API/2.0.0#/App)
 
 You can view it directly [Here](https://app.swaggerhub.com/apis-docs/jakunut453/Mobile_AppStore_API/2.0.0#/). This is a mockup of what it is supposed to look like and was generated using Swagger.
-![Image of Yaktocat]()
+![documentation](https://github.com/jakunut453/AppStoreAPI-OAS/blob/master/screenshots/documentation.PNG)
+
+
 To view the YAML code you can see it on SwaggerHub [Here](https://app.swaggerhub.com/apis/jakunut453/Mobile_AppStore_API/2.0.0#/App)
-![Image of Yaktocat]()
+![code](https://github.com/jakunut453/AppStoreAPI-OAS/blob/master/screenshots/code.PNG)
 ## Features
 
 Below are some of the features of the API
