@@ -1,0 +1,1623 @@
+openapi: 3.0.0
+info:
+  version: "2.0.0"
+  title: 'Mobile App Store API'
+  description: 'API for a mobile application store. This a generic API that can be made use in many applications. It could be used in the Mobile Application store for phones Ex:AppStore for IOS, PlayStore for Android. Or it can be extended for even desktop application stores such as the windows store used by microsoft. The data is broken down into collections such as apps, users and developer. Endpoints are described to manipulate the data using appropriate GET,PUT,POST and DELETE calls. In addition it has a featured collection that has dynamic data for things like top charts which may change daily.'
+  contact:
+    name: Surya Balakrishnan
+    url: https://github.com/jakunut453
+    
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/jakunut453/Mobile_AppStore_API/1.0.0  
+tags:
+  - name: apps
+    description: Operation on apps
+  - name: categories
+    description: Different categories the Apps fall into
+  - name: developers
+    description: Operations on App publishers/developers
+  - name: users
+    description: Operations on User data
+  - name: featured
+    description: taking care of ranking of apps which can be used for top-charts etc.
+    
+paths:
+  /apps:
+    get:
+      tags:
+        - apps
+      summary: Get info on Apps
+      description: Obtain information about all Apps available in the app store
+      parameters:
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/Category'
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Succesful pull of app info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+                
+    post:
+      tags:
+        - apps
+      summary: Create a new database for apps
+      description: By sending an array of apps a new database with those apps is created if it does not aldready exist.
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+      responses:
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+          
+  /apps/{id}:
+    get:
+      tags:
+        - apps
+      summary: Obtain info about specific Application
+      description: Given an id information on that particular app is returned. If it does not exist an appropriate response code is returned.
+      parameters:
+      - in: path
+        name: id
+        required: true
+        description: id of the application
+        schema:
+          type: integer
+          example: 5
+      security:
+        - OAuth2:
+            - 'read'
+      responses: 
+        '200':
+          $ref: '#/components/responses/200SuccesfulSingleApp'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+    
+    post:
+      tags:
+      - apps
+      summary: Add a new app
+      description: Add an app to the store, which can be through a form, json or xml
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '400':
+          description: Invalid Id
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/App'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/App'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/App'
+    
+    put:
+      tags:
+      - apps
+      summary: Update an existing app
+      description: Pass a request body to update an existing app.
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Resource not found
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/App'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/App'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/App'
+              
+    delete:
+      tags:
+      - apps
+      summary: Delete an app from the store
+      description: Remove an app from the store by providing its id.
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Invalid ID supplied
+        
+  /apps/{id}/screenshots:
+    get:
+      tags:
+      - apps
+      summary: pull screenshots/examples of its working
+      description: Get the screenshots of the working of the app
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/NoOfItems'
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: binary
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+          
+    post:
+      tags:
+      - apps
+      summary: Add screenshots
+      description: Add screenshots of the working of the app
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '400':
+          description: Invalid Id
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: array
+              items:
+                type: string
+                format: binary
+    
+    delete:
+      tags:
+      - apps
+      summary: Remove screenshots
+      description: Remove all screenshots of an app
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Invalid ID supplied
+          
+  /apps/{id}/versions:
+    get:
+      tags:
+        - apps
+      summary: Get earlier versions
+      description: Get info on past versions of an app as an array in order. The first elements are the newer ones and the ones towards the end are older versions.
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/NoOfItems'
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Sucess
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+      
+    post:
+      tags:
+      - apps
+      summary: Add past versions of an app
+      description: Send an array of versions to create a new version history of an app
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '400':
+          description: Invalid Id
+        '405':
+          description: Invalid input
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+          
+  /apps/{id}/versions/history:
+    get:
+      tags:
+      - apps
+      summary: Get brief version history
+      description: Get a list of versions an brief version change description
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/NoOfItems'
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Sucess
+          content:
+            application/json:
+              schema: 
+                description: An array of objects with each object having its version and changes made
+                type: array
+                items:
+                  type: object
+                  properties:
+                    version:
+                      type: string
+                      example: 4.5.2
+                    changes:
+                      type: string
+                      example: minor bug fixes and changes to UI
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+          
+    patch:
+      tags:
+      - apps
+      summary: update the list of versions 
+      description: send a version history array to update the existing version history. New elements are added and existing elements are updated.
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '404':
+          description: No resource 
+        '405':
+          description: Invalid input
+      requestBody:
+       content:
+            application/json:
+              schema: 
+                description: An array of objects with each object having its version and changes made
+                type: array
+                items:
+                  type: object
+                  properties:
+                    version:
+                      type: string
+                      example: 4.5.2
+                    changes:
+                      type: string
+                      example: minor bug fixes and changes to UI 
+                      
+  /apps/{id}/versions/{version-number}:
+    get:
+      tags:
+      - apps
+      summary: Read info on a specific version of an app
+      description: Get detailed data on a specific version of an app
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: version-number
+        in: path
+        required: true
+        description: The version number of the specific version
+        schema:
+          type: string
+          example: 2.7.1 
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          $ref: '#/components/responses/200SuccesfulSingleApp'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+  
+  /apps/{id}/reviews:
+    get:
+      tags:
+      - apps
+      summary: Pull all reviews for an app
+      description: All reviews are pulled as an array of objects. Query parameters can be used to filter the results.
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: version-number
+        in: query
+        description: The version number of the App
+        schema:
+          type: string
+          example: 2.7.1 
+      - name: from-date
+        in: query
+        description: From date from which reviews must be got in DD-MM-YYYY format
+        schema:
+          type: string
+          example: 14-07-2019
+      - name: star-rating
+        in: query
+        description: star rating given to the review
+        schema:
+          type: integer
+          example: 4
+      - name: to-date
+        in: query
+        description: to date from which reviews must be got in DD-MM-YYYY format
+        schema:
+          type: string
+          example: 18-07-2019
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+          
+    patch:
+      tags:
+      - apps
+      summary: Update reviews for an app
+      description: An array of reviews are passed. New elements are added and existing elements are updated.
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: version-number
+        in: query
+        description: The version number of the App
+        schema:
+          type: string
+          example: 2.7.1 
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '405':
+          description: Invalid input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Review'
+                
+  /categories:
+    get:
+      tags:
+      - categories
+      summary: Get a list of currently available categories.
+      description: returns all the categories available. This is dynamic and can change frequently. New categories may be added or some may become redundant and be removed.
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200': 
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example: [Games, Social, News] 
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+          
+    post:
+      tags:
+      - categories
+      summary: create a new categories list
+      description: Create a new categories list during setup of the system. Needs admin priveleges to perform this action
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      responses:
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example: [Games, Social, News]
+    
+    patch:
+      tags:
+      - categories
+      summary: add new categories to list
+      description: send a list of categories. Categories not aldready existing are added.
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '405':
+          description: Invalid input
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example: [Games, Social, News]
+    
+    delete:
+      tags:
+      - categories
+      summary: Clear the categories list
+      description: delete all categories from the list. 
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+      
+  /categories/{category-name}:
+    get:
+      tags:
+      - categories
+      summary: Get app references of all apps in a certain category
+      description: return app references in the category. The app reference is smaller in size and contains only essential data.
+      parameters:
+      - name: category-name
+        in: path
+        required: true
+        description: The category of apps to be returned
+        schema:
+          type: string
+          example: Games
+      security:
+        - OAuth2:
+            - 'read'
+      responses: 
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppReference'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+  
+  /developers:
+    get:
+      tags:
+      - developers
+      summary: Get all developer info
+      description: return an array of all developer information
+      parameters:
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Succesful pull of developer info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Developers'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+      
+    post:
+      tags:
+      - developers
+      summary: Create a new developer database
+      description: Create a new database for developer
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      requestBody:
+        required: true
+        description: array of developer info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Developers'
+      responses:
+        '400':
+          description: Invalid Id
+        '405':
+          description: Invalid input
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+  
+  /developers/{developer-id}:
+    get:
+      tags:
+      - developers
+      summary: pull a particular devs info
+      description: get details about a particular developer
+      parameters:
+        - name: developer-id
+          in: path
+          required: true
+          description: Id of developer 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of dev info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Developer'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+                
+    post:
+      tags:
+      - developers
+      summary: create a new dev
+      description: add a new developer
+      parameters:
+        - name: developer-id
+          in: path
+          required: true
+          description: Id of developer 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '400':
+          description: Invalid Id
+        '405':
+          description: Invalid input
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        description: dev info to be added
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Developer'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Developer'
+   
+    put:
+      tags:
+      - developers
+      summary: Make changes to an existing dev
+      description: Update an existing developer
+      parameters:
+        - name: developer-id
+          in: path
+          required: true
+          description: Id of developer 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Developer not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Developer'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Developer'
+    
+    delete:
+      tags:
+      - developers
+      summary: Remove a dev
+      description: Delete a developer
+      parameters:
+        - name: developer-id
+          in: path
+          required: true
+          description: Id of developer 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Invalid ID supplied        
+          
+  /developers/{developer-id}/apps:
+    get:
+      tags:
+      - developers
+      summary: get all apps by a dev
+      description: get reference details about apps published by a specific developer
+      parameters:
+        - name: developer-id
+          in: path
+          required: true
+          description: Id of developer 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of dev info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppReference'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+    
+    patch:
+      tags:
+      - developers
+      summary: Modify a devs apps
+      description: modify the reference details about apps published by a specific developer
+      parameters:
+        - name: developer-id
+          in: path
+          required: true
+          description: Id of developer 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '404':
+          description: No resource 
+        '405':
+          description: Invalid input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AppReference'
+                
+  /developers/{developer-id}/apps/{app-id}:
+    get:
+      tags:
+      - developers
+      summary: Get details on a specific app by the dev
+      description: get details about an app published by a specific developer
+      parameters:
+        - name: developer-id
+          in: path
+          required: true
+          description: Id of developer 
+          schema:
+            type: integer
+            example: 6521
+        - name: app-id
+          in: path
+          required: true
+          description: Id of developers app 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of dev info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+  
+  /users:
+    get:
+      tags:
+      - users
+      summary: Pull user info
+      description: return an array of all user information
+      parameters:
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Succesful pull of user info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+    
+    post:
+      tags:
+      - users
+      summary: Create users given a list of their info
+      description: Create a new users
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      requestBody:
+        required: true
+        description: array of user info
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+      responses:
+        '405':
+          description: Invalid input
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+                  
+  /users/{user-id}:
+    get:
+      tags:
+      - users
+      summary: pull a users info
+      description: get details about a particular user
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of user info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+                
+    post:
+      tags:
+      - users
+      summary: Make a new user
+      description: create a new user
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '400':
+          description: Invalid Id
+        '405':
+          description: Invalid input
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+
+    put:
+      tags:
+      - users
+      summary: Make changes to an existing user.
+      description: update an existing user
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: User not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+   
+    delete:
+      tags:
+      - users
+      summary: Delete an existing user
+      description: Delete an user
+      parameters:
+        - name: user-id
+          in: path
+          required: true
+          description: Id of user 
+          schema:
+            type: integer
+            example: 6521
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Invalid ID supplied
+          
+  /users/{user-id}/apps:
+    get:
+      tags:
+      - users
+      summary: Get users downloaded apps
+      description: get details about the particular apps a  user has downloaded
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/NoOfItems'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of app info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppReference'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+    
+    post:
+      tags:
+      - users
+      summary: Add apps to a users app list
+      description: create a new user app list
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '400':
+          description: Invalid Id
+        '405':
+          description: Invalid input
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            
+    patch:
+      tags:
+      - users
+      summary: update the existing apps a user has
+      description: update the users apps
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '405':
+          description: Invalid input
+      requestBody:    
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AppReference'  
+    delete:
+      tags:
+      - users
+      summary: clear a users app list
+      description: delete all downloaded apps from the list
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Invalid ID supplied            
+  
+  /users/{user-id}/recommendations:
+    get:
+      tags:
+      - users
+      summary: get recommended apps
+      description: get recommended apps for a particular user
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/NoOfItems'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of app info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppReference'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+  
+  /users/{user-id}/wishlist:
+    get:
+      tags:
+      - users
+      summary: get apps a user has placed on his wishlist
+      description: get apps that the user has put on their wishlist
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/NoOfItems'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of wishlist info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppReference'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+    
+    post:
+      tags:
+      - users
+      summary: add apps to the wishlist 
+      description: add new items to user wishlist
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '400':
+          description: Invalid Id
+        '405':
+          description: Invalid input
+        '404':
+          description: Resource not found
+        '409':
+          description: Resource aldready exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+    
+    patch:
+      tags:
+      - users
+      summary: make changes to the wishlist
+      description: update the users apps
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+      responses:
+        '204':
+          description: No content
+        '405':
+          description: Invalid input
+      requestBody:    
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AppReference'  
+    delete:
+      tags:
+      - users
+      summary: Clear the wishlist
+      description: delete all downloaded apps from the list
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - OAuth2:
+            - 'write'
+            - 'read'
+            - 'admin'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Invalid ID supplied
+  
+  /featured/top-charts:
+    get:
+      tags:
+      - featured
+      summary: Get the apps in the current top charts.
+      description: get the apps in top charts in order which can also be searched by category. Number of results to be returned can be specified. Pagination is also available.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      security:
+        - OAuth2:
+            - 'read'
+      responses:
+        '200':
+          description: Successful pull of top charts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppReference'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+  
+  /featured/{heuristic}:
+    get:
+      tags:
+      - featured
+      summary: Get a ranking of apps based on some rule( Most downloads, rating)
+      description: get the apps in top charts in order which can also be searched by category after applying some heuristic. The heuristic could be most-total-downloads, sale, trending, early-access, new. Examples are shown below
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/Category'
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+        - name: heuristic
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - most-total-downloads
+              - sale
+              - new
+              - early-access
+              - pre-book
+            default: most-total-downloads
+          examples:
+            total-downloads: 
+              description: Sorted by most downloads all time
+              value: most-total-downloads
+            sale:
+              description: On apps that have been put on sale
+              value: sale
+            new:
+              description: Sorting done on those apps released within the last two weeks
+              value: new
+            early-access:
+              description: Beta releases for public consumption
+              value: early-access
+            pre-book:
+              description: Apps to be released that can be pre-booked for early access
+              value: pre-book
+      security:
+        - OAuth2:
+            - 'read'    
+      responses:
+        '200':
+          description: Successful pull of top charts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppReference'   
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource doesnt exist
+          
+components:
+  schemas: 
+    App:
+      description: Model containing app info
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 6
+        appName:
+          type: string
+          example: FaceNovel
+        about:
+          type: string
+          example: A social networking site with a large connection to the world of novels.
+        appCategory:
+          type: string
+          example: Social
+        price:
+          type: integer
+          example: 70
+        version:
+          type: string
+          example: 2.1.3
+        contains-ads:
+          type: boolean
+          example: true
+        in-app-purchases:
+          type: boolean
+          example: true
+        age-rating:
+          type: string
+          example: 3+
+        no-of-screenshot:
+          type: integer
+          example: 4
+        screenshotUrls:
+          type: array
+          items:
+            type: string
+            example: pixabay.com/3214
+        ranking:
+          type: integer
+          description: ranking in terms of some heuristics involving number of recent downloads, average user rating etc.
+          example: 431
+        totalDownloads:
+          type: integer
+          example: 10532
+        rating:
+          type: number
+          description: average of all user ratings
+          example: 4.2
+        size:
+          type: number
+          description: size of App in MB
+          example: 128
+        review:
+          $ref: '#/components/schemas/Review'
+        developer:
+          $ref: '#/components/schemas/Developer'
+    
+    Apps:
+      description: Array of app info
+      type: array
+      items: 
+        $ref: '#/components/schemas/App'
+        
+    AppReference:
+      description: Minimal description of App with only essential information
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 1893
+        name: 
+          type: string
+          example: Twitter
+        version:
+          type: string
+          example: 7.2.2
+        ranking: 
+          type: integer
+          example: 431
+        
+    Review:
+      description: A user review of an app
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 2
+        star-rating:
+          type: integer
+          example: 4
+        writtenReview:
+          type: string
+          example: Great game, played it many times over the years. 
+    
+    Developer:
+      description: Details about the Developer
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 232
+        name: 
+          type: string
+          example: 123.inc
+        email:
+          type: string
+          example: android-support@insta.com
+        website:
+          type: string
+          example: insta.com
+        apps:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppReference'
+    
+    Developers:
+      description: Array of developer info
+      type: array
+      items: 
+        $ref: '#/components/schemas/Developer'  
+    
+    User:
+      description: Details about the user
+      type: object
+      properties:
+        user-id:
+          type: integer
+          example: 23283
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        password:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          example: john.doe@abc.com
+        current-apps:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppReference'
+        past-apps:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppReference'
+          
+  parameters:
+    PageLimit:
+      name: limit
+      in: query
+      description: Limits the number of items on a page
+      schema:
+        type: integer
+        example: 15
+      
+    PageOffset:
+      name: offset
+      in: query
+      description: Specifies the page number of the items to be displayed
+      schema:
+        type: integer
+        example: 2
+    
+    Id:
+      in: path
+      name: id
+      required: true
+      description: Identifier of the resource
+      schema:
+        type: integer
+        example: 7821
+    
+    UserId:
+      name: user-id
+      in: path
+      required: true
+      description: Id of user 
+      schema:
+        type: integer
+        example: 6521
+        
+    NoOfItems:
+      in: query
+      name: id
+      description: Number of items to be returned
+      schema:
+        type: integer
+        example: 5
+    
+    Category:
+      name: category
+      in: query
+      description: Category of the app
+      schema:
+        type: string
+        example: Games
+        
+  responses:
+    200SuccesfulSingleApp:
+      description: Sucess
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/App'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/App'
+            
+    400Error:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object 
+            properties:
+              error-code:
+                type: string
+                example: 400
+              message:
+                type: string
+                example: Invalid request
+    
+    401Error:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object 
+            properties:
+              error-code:
+                type: string
+                example: 401
+              message:
+                type: string
+                example: Unauthorized - No valid API key provided
+    
+    402Error:
+      description: Request Failed
+      content:
+        application/json:
+          schema:
+            type: object 
+            properties:
+              error-code:
+                type: string
+                example: 402
+              message:
+                type: string
+                example: The parameters were valid but the request failed
+    
+    403Error:
+      description: No permission
+      content:
+        application/json:
+          schema:
+            type: object 
+            properties:
+              error-code:
+                type: string
+                example: 402
+              message:
+                type: string
+                example: The API key doesn't have permissions to perform the request
+    
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
